@@ -42,13 +42,6 @@ public class MainActivity extends ActionBarActivity {
         setup();
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
     private void insertItems() {
         Article a1 = new Article();
         a1.id = 1;
@@ -60,18 +53,6 @@ public class MainActivity extends ActionBarActivity {
         a2.id = 2;
         a2.title = "a2";
         a2.body = "body2";
-
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                Article a3 = new Article();
-                a3.id = 3;
-                a3.title = "a3";
-                a3.body = "body3";
-                a3.save();
-                Timber.d("A3 saved");
-            }
-        }, 10000);
 
         a1.save();
         a2.save();

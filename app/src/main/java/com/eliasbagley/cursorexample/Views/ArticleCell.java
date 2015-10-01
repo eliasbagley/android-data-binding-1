@@ -12,7 +12,6 @@ import com.eliasbagley.cursorexample.R;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import timber.log.Timber;
 
 /**
  * Created by eliasbagley on 9/30/15.
@@ -43,7 +42,6 @@ public class ArticleCell extends RelativeLayout {
     }
 
     public void populate(Article article) {
-        Timber.e("populating: " + article.title);
         _title.setText(article.title);
     }
 }

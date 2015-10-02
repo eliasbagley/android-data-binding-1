@@ -2,6 +2,7 @@ package com.eliasbagley.cursorexample;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
@@ -9,30 +10,36 @@ import android.widget.CursorAdapter;
 import com.eliasbagley.cursorexample.Models.Article;
 import com.eliasbagley.cursorexample.Views.ArticleCell;
 
-import timber.log.Timber;
-
 /**
  * Created by eliasbagley on 9/30/15.
  */
-public class ArticleAdapter extends CursorAdapter {
-    public ArticleAdapter(Context context, Cursor c, boolean autoRequery) {
-        super(context, c, autoRequery);
+
+class ArticleHolder extends RecyclerView.ViewHolder {
+    public ArticleCell _view;
+
+    public ArticleHolder(ArticleCell itemView) {
+        super(itemView);
+        _view = itemView;
     }
 
-    public ArticleAdapter(Context context, Cursor c, int flags) {
-        super(context, c, flags);
+    public void bind(Article article) {
+        _view.populate(article);
+    }
+}
+
+public class ArticleAdapter extends CursorRecyclerAdapter<ArticleHolder> {
+    public ArticleAdapter(Cursor cursor) {
+        super(cursor);
     }
 
     @Override
-    public View newView(Context context, Cursor cursor, ViewGroup viewGroup) {
-        ArticleCell cell = new ArticleCell(context);
-        cell.populate(Article.fromCursor(cursor));
-        return cell;
+    public void onBindViewHolderCursor(ArticleHolder holder, Cursor cursor) {
+        holder.bind(Article.fromCursor(cursor));
     }
 
     @Override
-    public void bindView(View view, Context context, Cursor cursor) {
-        ArticleCell cell = (ArticleCell) view;
-        cell.populate(Article.fromCursor(cursor));
+    public ArticleHolder onCreateViewHolder(ViewGroup parent, int i) {
+        ArticleCell cell = new ArticleCell(parent.getContext());
+        return new ArticleHolder(cell);
     }
 }

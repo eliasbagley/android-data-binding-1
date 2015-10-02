@@ -7,7 +7,14 @@
     android:background="@color/material_blue_grey_800"
     tools:context=".MainActivity">
 
-    <ListView
+    <!--<ListView-->
+        <!--android:id="@+id/main_list_view"-->
+        <!--android:layout_width="fill_parent"-->
+        <!--android:layout_height="fill_parent"-->
+        <!--android:background="@android:color/white"-->
+        <!--/>-->
+    <!-- -->
+    <android.support.v7.widget.RecyclerView
         android:id="@+id/main_list_view"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"

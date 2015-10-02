@@ -1,5 +1,6 @@
 package com.eliasbagley.cursorexample.Network.Managers;
 
+import com.activeandroid.ActiveAndroid;
 import com.eliasbagley.cursorexample.Models.Article;
 import com.eliasbagley.cursorexample.Network.API.ArticleAPI;
 import com.eliasbagley.cursorexample.Network.ServiceResponse.ArticlesServiceResponse;
@@ -30,17 +31,27 @@ public class ArticleManager {
         _articleAPI.getArticles(new Callback<ArticlesServiceResponse>() {
             @Override
             public void success(final ArticlesServiceResponse articlesServiceResponse, Response response) {
-                for (Article a : articlesServiceResponse.articles) {
-                    a.save();
+
+                ActiveAndroid.beginTransaction();
+                try {
+                    for (Article a : articlesServiceResponse.articles) {
+                        a.save();
+                    }
+                    ActiveAndroid.setTransactionSuccessful();
+                } finally {
+                    ActiveAndroid.endTransaction();
                 }
 
-                callback.success(articlesServiceResponse, response);
-
+                if (callback != null) {
+                    callback.success(articlesServiceResponse, response);
+                }
             }
 
             @Override
             public void failure(RetrofitError error) {
-                callback.failure(error);
+                if (callback != null) {
+                    callback.failure(error);
+                }
             }
         });
     }

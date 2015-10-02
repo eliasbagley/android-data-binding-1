@@ -15,9 +15,9 @@ import com.google.gson.annotations.SerializedName;
 @Table(name = "Articles", id = BaseColumns._ID)
 public class Article extends BaseModel {
 
-    private static final String ID = "id";
-    private static final String TITLE = "title";
-    private static final String BODY = "body";
+    public static final String ID = "id";
+    public static final String TITLE = "title";
+    public static final String BODY = "body";
 
     @SerializedName(ID)
     @Column(name = ID, unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)

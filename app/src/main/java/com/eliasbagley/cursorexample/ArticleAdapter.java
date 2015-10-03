@@ -26,7 +26,7 @@ public class ArticleAdapter extends CursorAdapter {
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup viewGroup) {
         ArticleCell cell = new ArticleCell(context);
-        cell.populate(Article.fromCursor(cursor));
+//        cell.populate(Article.fromCursor(cursor));
         return cell;
     }
 

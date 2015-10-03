@@ -22,7 +22,6 @@ import timber.log.Timber;
 public class MainActivity extends ActionBarActivity {
 
     @InjectView(R.id.main_list_view) ListView _listView;
-
     private ArticleAdapter _adapter;
 
     @Override

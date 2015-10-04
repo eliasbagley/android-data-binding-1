@@ -200,28 +200,6 @@ public abstract class CursorRecyclerAdapter<VH
             }
 
             notifyItemRangeChanged(0, getItemCount());
-
-//            CursorDiffResult diffResult = CursorDiff.diff(oldCursor, newCursor, "id");
-//
-//            for (Integer idx : diffResult.updated) {
-//                Timber.e("updating " + idx);
-//                notifyItemChanged(idx);
-//            }
-//
-//            for (Pair<Integer, Integer> p : diffResult.moved) {
-//                Timber.e("moving " + p.first + " to " + p.second);
-////                    notifyItemMoved(p.first, p.second); // TODO this is an issue since its reporting every index move
-//            }
-//
-//            for (Integer idx : diffResult.deleted) {
-//                Timber.e("deleting " + idx);
-//                notifyItemRemoved(idx);
-//            }
-//
-//            for (Integer idx : diffResult.inserted) {
-//                Timber.e("inserting " + idx);
-//                notifyItemInserted(idx);
-//            }
         } else {
             mRowIDColumn = -1;
             mDataValid = false;

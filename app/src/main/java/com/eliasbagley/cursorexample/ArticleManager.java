@@ -1,17 +1,13 @@
-package com.eliasbagley.cursorexample.Network.Managers;
+package com.eliasbagley.cursorexample;
 
 import com.activeandroid.ActiveAndroid;
 import com.eliasbagley.cursorexample.Models.Article;
-import com.eliasbagley.cursorexample.Network.API.ArticleAPI;
+import com.eliasbagley.cursorexample.Models.BaseModel;
 import com.eliasbagley.cursorexample.Network.ServiceResponse.ArticlesServiceResponse;
-import com.orm.SugarRecord;
-
-import java.util.List;
 
 import javax.inject.Inject;
 
 import retrofit.Callback;
-import retrofit.RestAdapter;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
@@ -25,6 +21,15 @@ public class ArticleManager {
     @Inject
     public ArticleManager(ArticleAPI articleAPI) {
         _articleAPI = articleAPI;
+    }
+
+    public static void findOrUpdate(BaseModel m) {
+        Integer id = 0;
+
+        //TODO find the object and update the properties
+
+        // else
+        m.save();
     }
 
     public void getArticles(final Callback<ArticlesServiceResponse> callback) {

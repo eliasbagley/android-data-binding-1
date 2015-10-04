@@ -1,4 +1,4 @@
-package com.eliasbagley.cursorexample.Network.API;
+package com.eliasbagley.cursorexample;
 
 import com.eliasbagley.cursorexample.Network.ServiceResponse.ArticlesServiceResponse;
 
@@ -9,6 +9,6 @@ import retrofit.http.GET;
  * Created by eliasbagley on 9/29/15.
  */
 public interface ArticleAPI {
-    @GET("articles.json")
+    @GET("/")
     void getArticles(Callback<ArticlesServiceResponse> callback);
 }

@@ -1,76 +1,94 @@
 package com.eliasbagley.cursorexample;
 
 import android.database.Cursor;
-import android.util.Pair;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 /**
  * Created by eliasbagley on 10/1/15.
  */
 
-class CursorDiffResult {
-    public List<Integer> deleted = new ArrayList<>();
-    public List<Integer> inserted = new ArrayList<>();
-    public List<Integer> updated = new ArrayList<>();
-    public List<Pair<Integer, Integer>> moved = new ArrayList<>();
+class ListChange {
+    enum ListChangeType {
+        INSERTION,
+        DELETION,
+        MOVE,
+    }
+
+    public ListChangeType type;
+    public Integer index1;
+    public Integer index2;
+    public Integer value;
+
+    public ListChange(ListChangeType type, Integer index1, Integer index2, Integer value) {
+        this.type = type;
+        this.index1 = index1;
+        this.index2 = index2;
+        this.value = value;
+    }
+
 }
 
 public class CursorDiff {
 
-    public static CursorDiffResult diff(Cursor cursor1, Cursor cursor2, String key) {
-
-        CursorDiffResult result = new CursorDiffResult();
-
-        // Maps id to index
-        HashMap<Integer, Integer> map1 = new HashMap<>();
-        HashMap<Integer, Integer> map2 = new HashMap<>();
-
-        ArrayList<Integer> list1 = convertToList(cursor1, key);
-        ArrayList<Integer> list2 = convertToList(cursor2, key);
-
-        for (int i = 0; i < list1.size(); i++) {
-            Integer value = list1.get(i);
-            map1.put(value, i);
-        }
-
-        for (int i = 0; i < list2.size(); i++) {
-            Integer value = list2.get(i);
-            map2.put(value, i);
-        }
-
-
-        // Find moved and deleted
-
-        for (Integer id : map1.keySet()) {
-            Integer idx1 = map1.get(id);
-            Integer idx2 = map2.get(id);
-
-            if (idx2 == null) {
-                result.deleted.add(idx1);
-            } else if (idx1 != idx2) {
-                result.moved.add(new Pair(idx1, idx2));
-                map2.remove(id);
-            } else if (idx1 == idx2) {
-                result.updated.add(idx1); // Force an update each time for now
-                map2.remove(id);
-            }
-        }
-
-        // Find inserted index
-
-        for (Integer id : map2.keySet()) {
-            Integer idx = map2.get(id);
-            result.inserted.add(idx);
-        }
-
-        return result;
+    public static List<ListChange> diff(Cursor cursorA, Cursor cursorB, String key) {
+        List<Integer> a = convertToList(cursorA, key);
+        List<Integer> b = convertToList(cursorB, key);
+        return diff(a, b);
     }
 
-    private static ArrayList<Integer> convertToList(Cursor cursor, String key) {
-        ArrayList<Integer> list = new ArrayList<>();
+    public static List<ListChange> diff(List<Integer> a, List<Integer> b) {
+        List<ListChange> changes = new ArrayList<>();
+
+        recordDeletions(a, b, changes);
+        recordInsertions(a, b, changes);
+        recordMoves(a, b, changes);
+
+        return changes;
+    }
+
+    private static void recordInsertions(List<Integer> a, List<Integer> b, List<ListChange> changes) {
+        for (int i = 0; i < b.size(); i++) {
+            Integer value = b.get(i);
+            if (!a.contains(value)) {
+                changes.add(new ListChange(ListChange.ListChangeType.INSERTION, i, null, value));
+                a.add(i, value);
+                recordInsertions(a, b, changes);
+                return;
+            }
+        }
+    }
+
+    private static void recordDeletions(List<Integer> a, List<Integer> b, List<ListChange> changes) {
+        for (int i = 0; i < a.size(); i++) {
+            Integer value = a.get(i);
+            if (!b.contains(value)) {
+                changes.add(new ListChange(ListChange.ListChangeType.DELETION, i, null, value));
+                a.remove(i);
+                recordDeletions(a, b, changes);
+                return;
+            }
+        }
+    }
+
+    private static void recordMoves(List<Integer> a, List<Integer> b, List<ListChange> changes) {
+        for (int i = 0; i < a.size(); i++) {
+            if (a.get(i) != b.get(i)) {
+                Integer value = a.remove(i);
+
+                Integer to = b.indexOf(value);
+                a.add(to, value);
+
+                changes.add(new ListChange(ListChange.ListChangeType.MOVE, i, to, value));
+                recordMoves(a, b, changes);
+                return;
+            }
+        }
+    }
+
+    private static List<Integer> convertToList(Cursor cursor, String key) {
+        List<Integer> list = new ArrayList<>();
 
         if (cursor == null) {
             return list;

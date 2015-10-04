@@ -9,12 +9,16 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.Menu;
-import android.widget.ListView;
 
 import com.activeandroid.content.ContentProvider;
+import com.eliasbagley.cursorexample.Dagger.TMApp;
 import com.eliasbagley.cursorexample.Models.Article;
+import com.eliasbagley.cursorexample.Network.MockServer;
 
+
+import java.io.IOException;
+
+import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -25,19 +29,23 @@ public class MainActivity extends ActionBarActivity {
 
     @InjectView(R.id.main_list_view) RecyclerView _listView;
 
+    @Inject ArticleManager _manager;
+
     private ArticleAdapter _adapter;
+    private MockServer _mockServer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        TMApp.injectActivity(this);
         ButterKnife.inject(this);
 
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
         }
 
-//        _adapter = new ArticleAdapter(this, null, 0);
         _adapter = new ArticleAdapter(null);
         _listView.setAdapter(_adapter);
         _listView.setLayoutManager(new LinearLayoutManager(this));
@@ -47,23 +55,25 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void insertItems() {
+
+        _manager.getArticles(null);
+
         final Article a1 = new Article();
         a1.id = 1;
         a1.title = "a1";
         a1.body = "body1";
-
 
         final Article a2 = new Article();
         a2.id = 2;
         a2.title = "a2";
         a2.body = "body2";
 
-        Article a4 = new Article();
+        final Article a4 = new Article();
         a4.id = 4;
         a4.title = "a4";
         a4.body = "body4";
 
-        Article a5 = new Article();
+        final Article a5 = new Article();
         a5.id = 5;
         a5.title = "a5";
         a5.body = "body5";
@@ -72,19 +82,23 @@ public class MainActivity extends ActionBarActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                a1.title = "zerp";
+                Article a6 = new Article();
+                a6.id = 6;
+                a6.title = "a6";
+                a6.body = "body6";
 
+                Article a3 = new Article();
+                a3.id = 3;
+                a3.title = "a3";
+                a3.body = "body3";
+
+                a1.title = "berp";
                 a1.save();
-//                Article a6 = new Article();
-//                a6.id = 6;
-//                a6.title = "a6";
-//                a6.body = "body6";
-//
-//                a1.title = "DERRP";
-//
-//                a1.save();
-//                a6.save();
-//                a2.delete();
+
+                a6.save();
+                a3.save();
+                a2.delete();
+                a5.delete();
 
             }
         }, 8000);
@@ -96,6 +110,12 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void setup() {
+        try {
+            _mockServer = new MockServer();
+        } catch (IOException e) {
+            Timber.e("Failed to start server. IOException");
+        }
+
         getSupportLoaderManager().initLoader(0, null, new LoaderManager.LoaderCallbacks<Cursor>() {
             @Override
             public Loader<Cursor> onCreateLoader(int id, Bundle args) {

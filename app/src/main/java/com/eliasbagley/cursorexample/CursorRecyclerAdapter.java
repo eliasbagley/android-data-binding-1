@@ -29,12 +29,11 @@ import android.database.Cursor;
 import android.database.DataSetObserver;
 import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
-import android.util.Pair;
 import android.widget.Filter;
 import android.widget.FilterQueryProvider;
 import android.widget.Filterable;
 
-import timber.log.Timber;
+import java.util.List;
 
 /**
  * Provide a {@link android.support.v7.widget.RecyclerView.Adapter} implementation with cursor
@@ -184,27 +183,45 @@ public abstract class CursorRecyclerAdapter<VH
 
             // notify the observers about the new cursor
 
-            CursorDiffResult diffResult = CursorDiff.diff(oldCursor, newCursor, "id");
+            List<ListChange> changes = CursorDiff.diff(oldCursor, newCursor, "id");
 
-            for (Integer idx : diffResult.updated) {
-                Timber.e("updating " + idx);
-                notifyItemChanged(idx);
+            for (ListChange change : changes) {
+                switch (change.type) {
+                    case INSERTION:
+                        notifyItemInserted(change.index1);
+                        break;
+                    case DELETION:
+                        notifyItemRemoved(change.index1);
+                        break;
+                    case MOVE:
+                        notifyItemMoved(change.index1, change.index2);
+                        break;
+                }
             }
 
-            for (Pair<Integer, Integer> p : diffResult.moved) {
-                Timber.e("moving " + p.first + " to " + p.second);
-//                    notifyItemMoved(p.first, p.second); // TODO this is an issue since its reporting every index move
-            }
+            notifyItemRangeChanged(0, getItemCount());
 
-            for (Integer idx : diffResult.deleted) {
-                Timber.e("deleting " + idx);
-                notifyItemRemoved(idx);
-            }
-
-            for (Integer idx : diffResult.inserted) {
-                Timber.e("inserting " + idx);
-                notifyItemInserted(idx);
-            }
+//            CursorDiffResult diffResult = CursorDiff.diff(oldCursor, newCursor, "id");
+//
+//            for (Integer idx : diffResult.updated) {
+//                Timber.e("updating " + idx);
+//                notifyItemChanged(idx);
+//            }
+//
+//            for (Pair<Integer, Integer> p : diffResult.moved) {
+//                Timber.e("moving " + p.first + " to " + p.second);
+////                    notifyItemMoved(p.first, p.second); // TODO this is an issue since its reporting every index move
+//            }
+//
+//            for (Integer idx : diffResult.deleted) {
+//                Timber.e("deleting " + idx);
+//                notifyItemRemoved(idx);
+//            }
+//
+//            for (Integer idx : diffResult.inserted) {
+//                Timber.e("inserting " + idx);
+//                notifyItemInserted(idx);
+//            }
         } else {
             mRowIDColumn = -1;
             mDataValid = false;
